@@ -2,6 +2,8 @@
 
 This module simulates electron transport through a single electron transistor (SET). Not every institution has access to...
 >{TODO: insert figs, photos, etc.}
+>{TODO: 2d plot w/ charge states FROM JP}
+>{TODO: minimize and make pub ready FROM EO}
 
 ## Getting Started
 
