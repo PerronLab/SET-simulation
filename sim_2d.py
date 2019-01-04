@@ -1,6 +1,5 @@
-# ULTRA-LOW TEMPERATURE INVESTIGATION OF SILICON QUANTUM DOTS
 # written by Erick Daniel Ochoa, CSUSM Fall '18
-# master equation simulation of electron transport through a quantum dot
+# master equation simulation of electron transport through a quantum dot with spin states
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -125,10 +124,11 @@ for val in d:
         P1d[count1] = Pnow[2]
         P2[count1] = Pnow[3]
 
-        on1 = Po[count1]*gammaL*(fermi1dL + fermi1uL)
-        on2 = P1d[count1]*gammaL*fermi2dL + P1u[count1]*gammaL*fermi2uL
-        off1 = P1d[count1]*gammaL*(1-fermi1dL) + P1u[count1]*gammaL*(1-fermi1uL)
-        off2 = P2[count1]*gammaL*((1-fermi2dL) + (1-fermi2uL))
+        # current = all possible ways on state - all possible ways off state
+        on1 = Po[count1]*gammaL*(fermi1dL + fermi1uL) # possible ways on first state 
+        on2 = P1d[count1]*gammaL*fermi2dL + P1u[count1]*gammaL*fermi2uL # possible ways on second state
+        off1 = P1d[count1]*gammaL*(1-fermi1dL) + P1u[count1]*gammaL*(1-fermi1uL) # possible ways off first state
+        off2 = P2[count1]*gammaL*((1-fermi2dL) + (1-fermi2uL)) # possible ways off second state
 
         Inow = (-e)*(on1 + on2 - off1 - off2)
         I[count1,count2] = Inow
