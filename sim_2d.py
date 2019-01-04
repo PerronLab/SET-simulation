@@ -1,6 +1,6 @@
 # ULTRA-LOW TEMPERATURE INVESTIGATION OF SILICON QUANTUM DOTS
-# master equation simulation of electron transport
-# through a quantum dot
+# written by Erick Daniel Ochoa, CSUSM Fall '18
+# master equation simulation of electron transport through a quantum dot
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -8,60 +8,59 @@ start  = time.time()
 
 ########################################CONSTANTS#######################################
 # 1. declare variables
-e = 1.602e-19
-kb = 8.617e-5
-J2meV = 6.2415e18 # joule to meV conversion
-tL = tR = 0.04e9
-gammaL = 2*np.pi*tL**2
-gammaR = 2*np.pi*tR**2
+e = 1.602e-19 # electron charge [C]
+kb = 8.617e-5 # Boltzmanns constant [eV/K]
+J2eV = 6.2415e18 # joule to meV conversion [J/eV]
+tL = tR = 0.04e9 # tunneling rates {find from lit!}
+gammaL = 2*np.pi*tL**2 # tunneling rate onto dot from left
+gammaR = 2*np.pi*tR**2 # tunneling rate onto dot from right
 
-dL = dR = 125e-9
-bohrmag = 9.274e-24 # in Joules per Tesla
+dL = dR = 125e-9 # distance to dot [m]
+bohrmag = 9.274e-24 # bohr-magneton [J/K]
 ######################################PARAMETERS#######################################
-Cs = 2.5e-18
-Cg = 2e-18
-Cd = 1e-18
-Clg = 2e-18
-Crg = 2e-18
-Ctot = Cs + Cg + Cd + Clg + Crg
+Cs = 2.5e-18 # source capacitance [C]
+Cg = 2e-18 # gate capacitance [C]
+Cd = 1e-18 # drain capacitance [C]
+Clg = 2e-18 # left gate capacitance [C]
+Crg = 2e-18 # right gate capacitance [C]
+Ctot = Cs + Cg + Cd + Clg + Crg # total dot capacitance [C]
 Eq = 0
-Ec = e**2/Ctot
-T = 50
+Ec = e**2/Ctot # charging energy [J]
+T = 50 # temperature [K]
 beta  = 1/(T*kb)
-dsteps = 300
-psteps = 200
+dsteps = 300 # number of drain voltage steps
+psteps = 200 # number of plunger voltage steps
 
-Vs = 0
-Vdstart = -0.0175
-Vdstop = 0.025
-d = np.linspace(Vdstart,Vdstop,num= dsteps)
-Vd = np.zeros(shape=(psteps,dsteps))
+Vs = 0 # source voltage [V]
+Vdstart = -0.0175 # starting drain voltage [V]
+Vdstop = 0.025 # stopping drain voltage [V]
+d = np.linspace(Vdstart,Vdstop,num= dsteps) # 1D drain voltage array
+Vd = np.zeros(shape=(psteps,dsteps)) # 2D drain voltage array
 
-Vpstart = -0.02
-Vpstop = 0.1
-p = np.linspace(Vpstart,Vpstop,num= psteps)
-Vp = np.zeros(shape=(psteps,dsteps))
+Vpstart = -0.02 # starting plunger gate voltage [V]
+Vpstop = 0.1 # stopping plunger gate voltage [V]
+p = np.linspace(Vpstart,Vpstop,num= psteps) # 1D plunger voltage array
+Vp = np.zeros(shape=(psteps,dsteps)) # 2D plunger voltage array
 
-B  = 10
-zeeman  = bohrmag*B
-####################################################################################### 
-Eo = []
-E1u = []
-E1d = []
-E2 = []
-mu1 = []
-mu2 = []
-fermi1 = []
-fermi2 =[]
-fermi1 = []
-fermi2 =[]
+B  = 10 # magnetic field in T
+zeeman  = bohrmag*B # Zeeman energy [J]
+#####################################MAIN LOOP######################################### 
+# Possible energies for a two energy level system (N=2)
+Eo = [] # ground state energy [J] (N=0)
+E1u = [] # 1st energy level for spin up electrons [J] (N=1)
+E1d = [] # 1st energy level for spin down electrons [J] (N=1)
+E2 = [] # 2nd energy level [J] (N=2)
 
-I = np.zeros(shape=(psteps,dsteps))
-P = []
-Po = np.zeros(dsteps)
-P1u = np.zeros(dsteps)
-P1d = np.zeros(dsteps)
-P2 = np.zeros(dsteps)
+fermi1 = [] # fermi function for N=1
+fermi2 =[] # fermi function for N=2
+
+
+I = np.zeros(shape=(psteps,dsteps)) # current [A]
+P = [] # total probability
+Po = np.zeros(dsteps) # probability of zeroth state occupied
+P1u = np.zeros(dsteps) # probabilty of first spin-up state occupied
+P1d = np.zeros(dsteps) # probability of first spin-down state occupied
+P2 = np.zeros(dsteps) # probability of second state occupied
 count1 = 0
 count2 = 0
 
@@ -71,25 +70,19 @@ for val in d:
     
     for val in p:
         # 2. calculate charge state energies
-        #print count1, count2
+  
         Vd[count1,count2] = vdrain 
         Vp[count1,count2] = val 
         
         # N = 0
-        Eonow = ((-e*(0)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))*J2meV
-        #Eo.append(Eonow)
+        Eonow = ((-e*(0)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))*J2eV
+        
         # N = 1
-        E1unow = (((-e*(1)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))+zeeman)*J2meV
-        #E1u.append(E1unow)
-        # mu1now = E1unow - Eonow
-        # mu1.append(mu1now)
-        E1dnow = (((-e*(1)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))-zeeman)*J2meV
-        #E1d.append(E1dnow)
+        E1unow = (((-e*(1)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))+zeeman)*J2eV
+        E1dnow = (((-e*(1)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))-zeeman)*J2eV
+     
         # N = 2
-        E2now = (((-e*(2)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))+2*Eq)*J2meV
-        #E2.append(E2now)
-        # mu2now = E2now - E1unow
-        # mu2.append(mu2now)
+        E2now = (((-e*(2)+ Cs*Vs + Cd*vdrain + Cg*val)**2/(2*Ctot))+2*Eq)*J2eV
 
         # 3. calculate chemical potentials and Fermi functions
         muL = -Vs
@@ -107,7 +100,7 @@ for val in d:
 
         # 4. calculate tunneling rates
 
-        # tunnel right (use gammaR)
+        # all possible tunneling transitions
         gamma1u0 = gammaL*fermi1uL + gammaR*fermi1uR
         gamma1d0 = gammaL*fermi1dL + gammaR*fermi1dR 
         gamma01d = gammaL*(1-fermi1dL) + gammaR*(1-fermi1dR) 
@@ -132,16 +125,12 @@ for val in d:
         P1d[count1] = Pnow[2]
         P2[count1] = Pnow[3]
 
-        # on1 = Po[count]*gamma1d0 + Po[count]*gamma1u0 + P2[count]*(gamma1u2+gamma1d2)
-        # on0 = P1d[count]*gamma
         on1 = Po[count1]*gammaL*(fermi1dL + fermi1uL)
         on2 = P1d[count1]*gammaL*fermi2dL + P1u[count1]*gammaL*fermi2uL
         off1 = P1d[count1]*gammaL*(1-fermi1dL) + P1u[count1]*gammaL*(1-fermi1uL)
         off2 = P2[count1]*gammaL*((1-fermi2dL) + (1-fermi2uL))
 
         Inow = (-e)*(on1 + on2 - off1 - off2)
-        # Inow = (-e)*(gammaL*fermi2dL*P1d[count] + gammaL*fermi2uL*P1u[count]
-        # - gammaL*(1-fermi2uL)*P2[count] + gammaL*(1-fermi2dL)*P2[count]) 
         I[count1,count2] = Inow
         count1 +=1
         if count1 > psteps-1:
