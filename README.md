@@ -4,7 +4,7 @@ This module simulates electron transport through a single electron transistor (S
 ## Getting Started
 1. clone the repository
 ```
-git clone https:/github.com/PerronLab/SET-simulation
+git clone https://github.com/PerronLab/SET-simulation.git
 ```
 2. perform badass simulations
 ```
