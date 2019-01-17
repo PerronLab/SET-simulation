@@ -38,10 +38,10 @@ Cp = 0.487*Ctot
 
 #Quantum energy contributions.
 B = 14
-orbital = 1.1e-3*q
+orbital = 1.1e-3
 g = 0.43
 Magneton = 9.274e-24
-zeeman = g*Magneton*B
+zeeman = g*Magneton*B/q
 
 Ec = q**2/Ctot			# Charging energy (J)
 EceV = Ec/q			# Charging energy (eV)
@@ -58,14 +58,14 @@ Taking << to be 1%, and T = 200 mK, t is ~ 0.04 GHz '''
 
 ###########################################################################
 # Sweep parameters for 1 D sweep
-Vstart = -0.02;			# (V)	
-Vend = 0.05;			# (V)
-npts = 300;			# number of points in sweep
+Vstart = -0.01;			# (V)	
+Vend = 0.01;			# (V)
+npts = 100;			# number of points in sweep
 delV = (Vend-Vstart)/(npts-1) 	# step size (-1 for the endpoints)
 
-Vdstart = -0.0175
-Vdend = 0.025
-npts2 = 200;
+Vdstart = -0.01
+Vdend = 0.01
+npts2 = 100;
 delVd = (Vdend-Vdstart)/(npts2-1)
 
 
@@ -117,7 +117,7 @@ for k in np.arange(0,npts2):
 		E2[i,k] = (-q*(1- q0) + Cs*Vs + Cd*Vd[i,k] + Cp*Vp[i,k])**2/(2*q*Ctot) + zeeman
 		E3[i,k] = (-q*(1- q0) + Cs*Vs + Cd*Vd[i,k] + Cp*Vp[i,k])**2/(2*q*Ctot) - zeeman + orbital
 		E4[i,k] = (-q*(1- q0) + Cs*Vs + Cd*Vd[i,k] + Cp*Vp[i,k])**2/(2*q*Ctot) + zeeman + orbital
-		E4[i,k] = (-q*(2- q0) + Cs*Vs + Cd*Vd[i,k] + Cp*Vp[i,k])**2/(2*q*Ctot) + 2*orbital
+		E5[i,k] = (-q*(2- q0) + Cs*Vs + Cd*Vd[i,k] + Cp*Vp[i,k])**2/(2*q*Ctot) + 2*orbital
 		''' Define the elements of the matrix A of the master equations '''
 		# rates in and out of state 0
 		G10 = RL*Fermi((E1[i,k]-E0[i,k]),muL[i,k]) + RR*Fermi((E1[i,k]-E0[i,k]),muR)				# Rate from state 0 to gu
@@ -163,11 +163,11 @@ for k in np.arange(0,npts2):
 		A[4,5] = G45
 		# rates in and out of state 3 give same equations as in and out of state 2 so we don't need to include them (makes matrix non-invertable)
 		# normalize all probabilities to 1
-		A[4,0] = 1 
-		A[4,1] = 1 
-		A[4,2] = 1 
-		A[4,3] = 1 
-		A[4,4] = 1 
+		A[5,0] = 1 
+		A[5,1] = 1 
+		A[5,2] = 1 
+		A[5,3] = 1 
+		A[5,4] = 1 
 		A[5,5] = 1 
 		# Solution vector steady state --> all 0 normalization line = 1
 		C[5,0] = 1
@@ -178,12 +178,15 @@ for k in np.arange(0,npts2):
 		# Calculate the source current by looking at transfer across right barrier
 #		on1 = P[0]*RR*Fermi((E1[i,k]-E0[i,k]),muR)
 #		off1 = P[1]*RR*(1-Fermi((E1[i,k]-E0[i,k]),muR))
-#		on2 = P[1]*RR*Fermi((E2[i,k]-E1[i,k]),muR)
-#		off2 = P[2]*RR*(1-Fermi((E2[i,k]-E1[i,k]),muR))
-#		on3 = P[2]*RR*Fermi((E3[i,k]-E2[i,k]),muR)
-#		off3 = P[3]*RR*(1-Fermi((E3[i,k]-E2[i,k]),muR))
-#		on4 = P[3]*RR*Fermi((E4[i,k]-E3[i,k]),muR)
-#		off4 = P[4]*RR*(1-Fermi((E4[i,k]-E3[i,k]),muR))
+#		on2 = P[0]*RR*Fermi((E2[i,k]-E0[i,k]),muR)
+#		off2 = P[2]*RR*(1-Fermi((E2[i,k]-E0[i,k]),muR))
+#		on3 = P[0]*RR*Fermi((E3[i,k]-E0[i,k]),muR)
+#		off3 = P[3]*RR*(1-Fermi((E3[i,k]-E0[i,k]),muR))
+#		on4 = P[0]*RR*Fermi((E4[i,k]-E0[i,k]),muR)
+#		off4 = P[4]*RR*(1-Fermi((E4[i,k]-E0[i,k]),muR))
+#		on5 = P[1]*RR*Fermi((E5[i,k]-E1[i,k]),muR) + P[2]*RR*Fermi((E5[i,k]-E2[i,k]),muR) + P[3]*RR*Fermi((E5[i,k]-E3[i,k]),muR) + P[4]*RR*Fermi((E5[i,k]-E4[i,k]),muR)
+#		off5 = P[5]*RR*((1-Fermi((E5[i,k]-E1[i,k]),muR))+(1-Fermi((E5[i,k]-E2[i,k]),muR))+(1-Fermi((E5[i,k]-E3[i,k]),muR))+(1-Fermi((E5[i,k]-E4[i,k]),muR)))
+
 		on1 = P[0]*RR*Fermi((E1[i,k]-E0[i,k]),muR)
 		off1 = P[1]*RR*(1-Fermi((E1[i,k]-E0[i,k]),muR))
 		on2 = P[0]*RR*Fermi((E2[i,k]-E0[i,k]),muR)
@@ -192,11 +195,19 @@ for k in np.arange(0,npts2):
 		off3 = P[3]*RR*(1-Fermi((E3[i,k]-E0[i,k]),muR))
 		on4 = P[0]*RR*Fermi((E4[i,k]-E0[i,k]),muR)
 		off4 = P[4]*RR*(1-Fermi((E4[i,k]-E0[i,k]),muR))
-		on5 = P[1]*RR*Fermi((E5[i,k]-E1[i,k]),muR) + P[2]*RR*Fermi((E5[i,k]-E2[i,k]),muR) + P[3]*RR*Fermi((E5[i,k]-E3[i,k]),muR) + P[4]*RR*Fermi((E5[i,k]-E4[i,k]),muR)
-		off5 = P[5]*RR*((1-Fermi((E5[i,k]-E1[i,k]),muR))+(1-Fermi((E5[i,k]-E2[i,k]),muR))+(1-Fermi((E5[i,k]-E3[i,k]),muR))+(1-Fermi((E5[i,k]-E4[i,k]),muR)))
 
-		
-		
+		on5a = P[1]*RR*Fermi((E5[i,k]-E1[i,k]),muR)
+		on5b = P[2]*RR*Fermi((E5[i,k]-E2[i,k]),muR)
+		on5c = P[3]*RR*Fermi((E5[i,k]-E3[i,k]),muR)
+		on5d = P[4]*RR*Fermi((E5[i,k]-E4[i,k]),muR)
+		on5 = on5a+on5b+on5c+on5d
+
+		off5a = P[5]*RR*(1-Fermi((E5[i,k]-E1[i,k]),muR))
+		off5b = P[5]*RR*(1-Fermi((E5[i,k]-E2[i,k]),muR))
+		off5c = P[5]*RR*(1-Fermi((E5[i,k]-E3[i,k]),muR))
+		off5d = P[5]*RR*(1-Fermi((E5[i,k]-E4[i,k]),muR))
+		off5 = off5a+off5b+off5c+off5d
+
 		I[i,k] = -q*(on1 + on2 + on3 + on4 +on5 - off1 -off2 - off3 -off4 - off5)
 	
 
@@ -207,4 +218,8 @@ for k in np.arange(0,npts2):
 #plt.show()
 #plt.plot(Vp,I,'.-k')
 plt.pcolormesh(Vp,Vd,I, cmap=plt.get_cmap('seismic'))
+#plt.contourf(Vp,Vd,I,100, cmap=plt.get_cmap('seismic'))
+#plt.plot(Vp[:,0],I[:,0],'.-k')
+#plt.contour(Vp,Vd,I,100, cmap=plt.get_cmap('seismic'))
+plt.colorbar()
 plt.show()

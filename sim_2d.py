@@ -25,7 +25,7 @@ Crg = 2e-18 # right gate capacitance [C]
 Ctot = Cs + Cg + Cd + Clg + Crg # total dot capacitance [C]
 Eq = 0
 Ec = e**2/Ctot # charging energy [J]
-T = 50 # temperature [K]
+T = .50 # temperature [K]
 beta  = 1/(T*kb)
 dsteps = 300 # number of drain voltage steps
 psteps = 200 # number of plunger voltage steps
@@ -37,7 +37,7 @@ d = np.linspace(Vdstart,Vdstop,num= dsteps) # 1D drain voltage array
 Vd = np.zeros(shape=(psteps,dsteps)) # 2D drain voltage array
 
 Vpstart = -0.02 # starting plunger gate voltage [V]
-Vpstop = 0.1 # stopping plunger gate voltage [V]
+Vpstop = 0.2 # stopping plunger gate voltage [V]
 p = np.linspace(Vpstart,Vpstop,num= psteps) # 1D plunger voltage array
 Vp = np.zeros(shape=(psteps,dsteps)) # 2D plunger voltage array
 
