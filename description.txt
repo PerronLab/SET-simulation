@@ -1,1 +1,0 @@
-Simulations used in American Journal of Physics paper "Transport Through Quantum Dots: An Introduction via Master Equation Simulations"
