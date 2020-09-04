@@ -3,7 +3,7 @@
 
 Charge_State_Energies.py  --> Energy of different charge states vs Vg
 
-Simulation_metallic_dots-2D.py --> simulation of I vs Vg of metallic dot
+Simulation_metallic_dots-1D.py --> simulation of I vs Vg of metallic dot
 
 Simulation_metallic_dots-2D.py --> simulation of I vs Vg vs Vd of metallic dot
 
